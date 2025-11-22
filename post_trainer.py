@@ -15,7 +15,7 @@ class PostTrainer(Trainer):
     def __init__(self, args):
         super(PostTrainer, self).__init__(args)
         self.args = args
-        self.load_metatrain()#先预训练，再微调,得到训练好的参数
+        self.load_metatrain()
         self.test_model = None
 
         # dataloader
@@ -29,7 +29,6 @@ class PostTrainer(Trainer):
                                     + list(self.kge_model.parameters()), lr=self.args.posttrain_lr)
 
     def load_metatrain(self):
-        # state = torch.load(self.args.metatrain_state, map_location=self.args.gpu)
         state = torch.load(os.path.join(self.state_path, self.name + '.best'), map_location=self.args.gpu)
         self.ent_init.load_state_dict(state['ent_init'])
         self.rgcn.load_state_dict(state['rgcn'])
