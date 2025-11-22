@@ -135,7 +135,6 @@ class PostTrainer(Trainer):
         src = relation_triplets[:, 0]  # head_relation
         dst = relation_triplets[:, 1]  # tail_relation
 
-        # 构造 DGLGraph；节点代表所有关系，边由 src, dst 构成
         # 就是单向的
         g_rel = dgl.graph((src, dst), num_nodes=self.args.num_rel * 2).to(self.args.gpu)
 
@@ -144,20 +143,13 @@ class PostTrainer(Trainer):
         # 这里初始化为全零，也可以使用随机初始化
         g_rel.ndata['feat'] = torch.zeros((num_nodes, self.args.rel_dim), device=self.args.gpu)
 
-        # 设置边特征。这里将第三列作为边类型
         g_rel.edata['type'] = relation_triplets[:, 2]
 
-        # 由于 RGCNLayer 内部会自动计算 g.in_degrees()，这里不必手动设置
-
-        # 将构造好的关系图传入 RGCN 模型（你提供的 RGCN 模型代码已经支持 homogeneous graph 的输入）
         g_rel.ndata['h'] = torch.randn(num_nodes, self.args.ent_dim).to(self.args.gpu)
-        # g_rel.ndata['h'] = self.ent_init(torch.arange(g_rel.num_nodes(), device=self.args.gpu))#??
         rel_emb = self.rgcn(g_rel)
-        # print(f"rel_emb grad status: {rel_emb.requires_grad}")  # True 表示可训练
         return rel_emb
 
     def build_dgl_graph(self,edge_list,args,label='test'):
-        # offset = len(entity2id)
         relation2id = args.relation2id
         if label=='train':
             offset = len(args.entity2id)
@@ -170,7 +162,7 @@ class PostTrainer(Trainer):
             event2id = args.test_event2id
             fu_dict = args.test_fuzzy_dict
         src_ids, dst_ids, rel_ids,fuzziness_list = [], [], [],[]
-        rel_map = {}#重新映射了？
+        rel_map = {}
         rel_id_counter = 0
         for h, t, r in edge_list:
             h_id = self.get_node_id(h, entity2id, event2id, offset)
@@ -181,9 +173,7 @@ class PostTrainer(Trainer):
             if r not in rel_map:
                 rel_map[r] = rel_id_counter
                 rel_id_counter += 1
-            #模糊度的获取依旧是之前的映射
             fuzziness_list.append(fu_dict.get((h_id, relation2id[r], t_id)))
-            #id为所谓，不用这个映射
             rel_ids.append(rel_map[r])
 
         g = dgl.graph((src_ids, dst_ids), num_nodes=len(entity2id) + len(event2id))
