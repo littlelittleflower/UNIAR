@@ -171,9 +171,6 @@ elif llm_name == "gpt-4":
     llm = Chatgpt_Component(model_name=llm_name)
 
 data_path = "../llmoutput/"
-# input_modes = ["des", "exp_1", "d&e_1"]
-# output_modes = ["fixed", "refer", "free"]
-# file_names = ["FB15k237", "Wikidata", "NELL995","eventkg"]
 input_modes = ["des"]
 output_modes = ["fixed"]
 # file_names = ["FB15k237"]
@@ -194,7 +191,6 @@ for input_mode in input_modes:
             rel_list = list(rel_text_dict.keys())
             relname2id_dict = {rel: "rel" + str(id) for id, rel in enumerate(rel_list)}
             relid2name_dict = {v: k for k, v in relname2id_dict.items()}
-            # rel_example_dict = json.load(open(data_path + file_name + "-r2example.json", "r", encoding="utf8"))
 
             start, call_size = 0, 5
             total_results = {}
