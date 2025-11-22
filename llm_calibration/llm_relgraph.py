@@ -66,12 +66,6 @@ class Llama_Component(object):
             torch_dtype=torch.float16,
             trust_remote_code=True  #
         )
-        # self.generator = Llama.build(
-        #     ckpt_dir= root + self.ckpt_dir,
-        #     tokenizer_path= root + "tokenizer.model",
-        #     max_seq_len=2048,
-        #     max_batch_size=8,
-        # )
 
     def call(self, messages):
 
@@ -83,16 +77,7 @@ class Llama_Component(object):
         outputs = self.model.generate(**inputs, max_new_tokens=256)
         print(self.tokenizer.decode(outputs[0], skip_special_tokens=True))
         return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-        # inputs = tokenizer(messages, return_tensors="pt").to("cuda")
-        # outputs = model.generate(**inputs, max_new_tokens=100)
-        # print(tokenizer.decode(outputs[0]))
-        # results = self.generator.chat_completion(
-        #               [messages],  # type: ignore
-        #               max_gen_len=None,
-        #               temperature=0.1,
-        #               top_p=0.9,
-        #           )
-        # return results[0]['generation']['content']
+
 
 
 def get_taskdesc_bymode(mode):
@@ -191,8 +176,8 @@ data_path = "../llmoutput/"
 # file_names = ["FB15k237", "Wikidata", "NELL995","eventkg"]
 input_modes = ["des"]
 output_modes = ["fixed"]
-file_names = ["FB15k237"]
-# file_names = ["eventkg"]
+# file_names = ["FB15k237"]
+file_names = ["eventkg"]
 # file_name = file_names[0]
 for input_mode in input_modes:
     for output_mode in output_modes:
